@@ -42,7 +42,7 @@ public class PuppetGatlingProjectAction implements Action {
         this.project = project;
     }
 
-    private Run getLastSuccessfulBuild() {
+    private Run<?, ?> getLastSuccessfulBuild() {
         return project.getLastSuccessfulBuild();
     }
     
@@ -60,9 +60,9 @@ public class PuppetGatlingProjectAction implements Action {
 		return false;
 	}
 
-    @SuppressWarnings("unused")
+    //@SuppressWarnings("unused")
     public int getLastSuccessfulNumber() {
-        Run latestSuccessfulBuild = getLastSuccessfulBuild();
+        Run<?, ?> latestSuccessfulBuild = getLastSuccessfulBuild();
         if (latestSuccessfulBuild == null) {
             return 0;
         }

@@ -1,6 +1,7 @@
 package com.puppetlabs.jenkins.plugins.puppetgatling;
 
 import static com.puppetlabs.jenkins.plugins.puppetgatling.Constant.*;
+
 import com.excilys.ebi.gatling.jenkins.BuildSimulation;
 import com.excilys.ebi.gatling.jenkins.GatlingBuildAction;
 import com.puppetlabs.jenkins.plugins.puppetgatling.gatling.PuppetGatlingBuildAction;
@@ -13,11 +14,9 @@ import java.util.*;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
-
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import hudson.Extension;
-
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
@@ -46,11 +45,18 @@ import hudson.tasks.Recorder;
  * 	as a post-build step.
  *
  * @author Brian Cain
+ *
+ * Suppress Eclipse Warning:
+ * The return type BuildStepDescriptor for getDescriptior() from the
+ * type Recorder needs unchecked conversion to conform to Descriptor<T> from the
+ * type Describable<T>
  */
+@SuppressWarnings("unchecked")
 public class PuppetGatlingPublisher extends Recorder implements Serializable{
 
     private boolean deployEvenBuildFail;
     private PrintStream logger;
+    private static final long serialVersionUID = 42L;
 
     // New constructor
     @DataBoundConstructor
@@ -67,7 +73,8 @@ public class PuppetGatlingPublisher extends Recorder implements Serializable{
         return Arrays.asList(new PuppetGatlingProjectAction(project));
     }
 
-    private boolean isPerformDeployment(AbstractBuild build) {
+    @SuppressWarnings("unused")
+    private boolean isPerformDeployment(AbstractBuild<?, ?> build) {
         Result result = build.getResult();
         if (result == null) {
             return true;
@@ -193,7 +200,7 @@ public class PuppetGatlingPublisher extends Recorder implements Serializable{
 
         logger.println("[PuppetGatling] - The hash map is below.");
         logger.println("[PuppetGatling] - The values are printed as: [Total Requests, Successful Requests, Failed Requests, Mean Response Time]");
-        for (Map.Entry entry : groupDict.entrySet()){;
+        for (Map.Entry<String,List<SimulationData>> entry : groupDict.entrySet()){;
             List<SimulationData> lst = groupDict.get(entry.getKey());
             for (SimulationData sd : lst){
                 logger.println("[PuppetGatling] - The hash map key, value is: " + entry.getKey() + ", " + sd.prettyPrint());
@@ -322,7 +329,7 @@ public class PuppetGatlingPublisher extends Recorder implements Serializable{
         Map<String, List<SimulationData>> simulationData = simulationReport.getSimulationDataList();
 
         int counter = 0;
-        for (Map.Entry entry : simulationData.entrySet()){;
+        for (Map.Entry<String,List<SimulationData>> entry : simulationData.entrySet()){;
             List<SimulationData> lst = simulationData.get(entry.getKey());
             int numerator = 0;
             if (lst.size() > 0){
@@ -453,9 +460,10 @@ public class PuppetGatlingPublisher extends Recorder implements Serializable{
 
         return simulationReport;
     }
-
+    
+    @SuppressWarnings("unused")
     private Long getResponseTime(Map<String, Long> responseList, String key){
-        for (Map.Entry entry : responseList.entrySet()){
+        for (Map.Entry<String,Long> entry : responseList.entrySet()){
             if (entry.getKey().equals(key)){
                 return Long.parseLong(entry.getValue().toString());
             }
